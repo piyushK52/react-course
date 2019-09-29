@@ -5,9 +5,9 @@ import Person from "./Person/Person";
 class App extends Component {
   state = {
     persons: [
-      { name: "Piyush", age: 22 },
-      { name: "Manu", age: 29 },
-      { name: "Stephanie", age: 22 }
+      { id: "asj2n3", name: "Piyush", age: 22 },
+      { id: "jksdn4", name: "Manu", age: 29 },
+      { id: "sdkjn3", name: "Stephanie", age: 22 }
     ],
     otherState: "some other values",
     showPersons: false
@@ -26,27 +26,28 @@ class App extends Component {
     });
   };
 
-  nameChangedHandler = event => {
-    this.setState({
-      persons: [
-        { name: "Piyush", age: 22 },
-        { name: event.target.value, age: 29 },
-        { name: "Stephanie", age: 22 }
-      ]
+  nameChangedHandler = (event,id) => {
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id
     });
+    const person = {...this.state.persons[personIndex]}; 
+    person.name = event.target.value; 
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+    this.setState({persons: persons});
   };
 
   togglePersonHandler = () => {
-    this.setState({showPersons: !this.state.showPersons});
+    this.setState({ showPersons: !this.state.showPersons });
   };
 
-  deletePersonHandler = (personIndex) => {
+  deletePersonHandler = personIndex => {
     // const person = this.state.persons.slice(); slice without argument  copies it to the new array
     // no using slice will store a reference of persons in person
     const person = [...this.state.persons]; // another way of copying the persons object
     // good practice is always to copy the current the state, change it then update the using setState
     person.splice(personIndex, 1);
-    this.setState({persons: person});
+    this.setState({ persons: person });
   };
 
   render() {
@@ -60,13 +61,21 @@ class App extends Component {
 
     let persons = null;
 
-    if(this.state.showPersons) {
+    if (this.state.showPersons) {
       persons = (
         <div className="">
-            {this.state.persons.map((person,index) => {
-              return <Person click={() => this.deletePersonHandler(index)} name={person.name} age={person.age} />
-            })}
-          </div>
+          {this.state.persons.map((person, index) => {
+            return (
+              <Person
+                click={() => this.deletePersonHandler(index)}
+                key={person.id}
+                name={person.name}
+                age={person.age}
+                changed={(event)=>this.nameChangedHandler(event,person.id)}
+              />
+            );
+          })}
+        </div>
       );
     }
 
